@@ -1,0 +1,14 @@
+{
+  "name": "TethPay",
+  "version": "1.0.0",
+  "description": "Payment non-custodial extention for integration ERC20 in Telegram",
+  "main": "main.js",
+  "repository": "git@github.com:qpwedev/teth-pay.git",
+  "author": "qpwedev <russfdk@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^18.15.11",
+    "dotenv": "^16.0.3",
+    "telegraf": "^4.12.2"
+  }
+}
