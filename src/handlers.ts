@@ -85,10 +85,11 @@ const inlineQueryResultHandler = async (ctx: any) => {
     const web3Provider = activeSessions.get("123");
     const inlineQueryMessage = ctx.update.chosen_inline_result!.query;
     const type = validateInlineQuery(inlineQueryMessage);
+    console.log(type)
+    console.log("inlineQueryMessage", inlineQueryMessage);
 
-    let result: InlineQueryResult[];
-
-    if (type === InlineQueryType.SEND) {
+// add validation
+    try {
         const [username, amount, currency] = inlineQueryMessage.split(' ');
         await sendTokens(
             // @ts-ignore
@@ -96,7 +97,10 @@ const inlineQueryResultHandler = async (ctx: any) => {
             "0xB09AE5670c0FA938BfEeEe3E2653dcD18cDaA68e",
             amount, currency
         );
+    } catch (error) {
+        console.log(error);
     }
+
 
 }
 
