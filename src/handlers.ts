@@ -11,18 +11,18 @@ const startHandler = async (ctx: Context) => {
 }
 
 const connectWalletHandler = async (ctx: Context) => {
-    const uri = await getConnectionUri();
+    try {
+        const uri = await getConnectionUri();
 
-    const chatId = ctx.chat!.id;
+        const chatId = ctx.chat!.id;
+        const outputFilePath = './img/' + chatId + 'qrcode.png';
 
-    const outputFilePath = './img/' + chatId + 'qrcode.png';
-
-    await generateQRCode(uri.toString(), outputFilePath);
-
-    console.log('connect wallet handler');
-
-    await editOrSend(ctx, 'Connecting wallet...', backKeyboard, outputFilePath);
-
+        await generateQRCode(uri.toString(), outputFilePath);
+        await editOrSend(ctx, 'Connecting wallet...', backKeyboard, outputFilePath);
+    }
+    catch (error) {
+        console.log(error);
+    }
 }
 
 const inlineQueryHandler = async (ctx: Context) => {

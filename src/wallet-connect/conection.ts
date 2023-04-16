@@ -75,26 +75,25 @@ async function getConnectionUri() {
     resolveUri(uri);
   });
 
-  try {
-    provider
-      .connect({
-        namespaces: {
-          eip155: {
-            methods: ["eth_sendTransaction"],
-            chains: [`eip155:${chainId}`],
-            events: ["chainChanged", "accountsChanged"],
-            rpcMap: {},
-          },
+  provider
+    .connect({
+      namespaces: {
+        eip155: {
+          methods: ["eth_sendTransaction"],
+          chains: [`eip155:${chainId}`],
+          events: ["chainChanged", "accountsChanged"],
+          rpcMap: {},
         },
-      })
-      .then((session) => {
-        console.log("PROVIDER APPEARED");
-        const web3Provider = new providers.Web3Provider(provider);
-        activeSessions.set("123", web3Provider);
-      });
-  } catch (e) {
-    console.log("error", e);
-  }
+      }
+    })
+    .then((session) => {
+      console.log("PROVIDER APPEARED");
+      const web3Provider = new providers.Web3Provider(provider);
+      activeSessions.set("123", web3Provider);
+    }).catch((error) => {
+      console.log("PROVIDER ERROR", error);
+    }
+  );
 
   const uri = await uriPromise;
 
