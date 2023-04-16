@@ -1,5 +1,5 @@
 import { Context } from "telegraf";
-import { backKeyboard, inlineSendKeyboard, startKeyboard } from "./markups";
+import { backKeyboard, inlineSendKeyboard, inlineSplitKeyboard, startKeyboard } from "./markups";
 import { editOrSend, generateQRCode } from "./utils/utils";
 import { InlineQueryResult } from "typegram";
 import { InlineQueryType, validateInlineQuery } from "./validators";
@@ -67,6 +67,40 @@ const inlineQueryHandler = async (ctx: Context) => {
             }
         ]
 
+    } else if (type === InlineQueryType.SPLIT) {
+        const [ amount, currency] = inlineQueryMessage.split(' ');
+        const usernamePattern = /@\w+/g;
+        const usernames = inlineQueryMessage.match(usernamePattern) || [];
+        const usernamesString = usernames.join(", ");
+
+        const value = Number(amount) / usernames.length;
+        
+        let msgText = '';
+        usernames.forEach((username) => {
+            msgText += `${username} ${value} ${currency}\n`
+
+            // borrowStore.create({
+            //     address: '',
+            //     amount: value,
+            //     username: username.slice(1)
+            // })
+        })
+
+        result = [
+            {
+                type: 'article',
+                id: '1',
+                title: 'Split button',
+                input_message_content: {
+                    message_text: `Splitting the bill\n\n${msgText}`
+                },
+                description: `Splitting the ${amount} ${currency} between ${usernamesString}`,
+                reply_markup: {
+                    inline_keyboard: inlineSplitKeyboard()
+                },
+                thumb_url: 'https://telegra.ph/file/47b5c451ddd2af817d05c.jpg'
+            }
+        ]
     } else {
         // if unknown type
         return;
@@ -100,6 +134,18 @@ const inlineQueryResultHandler = async (ctx: any) => {
 
 }
 
+// const splitHandler = async (ctx: Context) => {
+//     const name = ctx.callbackQuery.from.username;
+
+//     await borrowStore.readAll().then((borrowers:any[]) => {
+//         const isBorrower = borrowers.some(
+//             (borrower) => borrower.username === name
+//         )
+
+//         if (isBorrower) console.log('borrower');
+        
+//     })
+// }
 
 export {
     startHandler,

@@ -17,9 +17,22 @@ const inlineSendKeyboard = () => {
     ]
 }
 
+const inlineSplitKeyboard = () => {
+    return [
+        [{ text: "Pay", callback_data: "split_pay" }],
+    ]
+}
+
+const inlinePayKeyboard = () => {
+    return [
+        [{ text: "Pay", callback_data: "pay" }],
+    ]
+}
+
 
 export {
     startKeyboard,
     backKeyboard,
-    inlineSendKeyboard
+    inlineSendKeyboard,
+    inlineSplitKeyboard, inlinePayKeyboard
 }

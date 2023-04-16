@@ -1,7 +1,8 @@
 export enum InlineQueryType {
     SEND = 'send',
     VOTE = 'vote',
-    UNKNOWN = 'unknown'
+    UNKNOWN = 'unknown',
+    SPLIT = "split"
 }
 
 const inlineQueryTypes = [
@@ -13,6 +14,10 @@ const inlineQueryTypes = [
     {
         type: InlineQueryType.VOTE,
         regex: /^kek$/g,
+    },
+    {
+        type: InlineQueryType.SPLIT,
+        regex: /^(\d+)\s+([a-zA-Z]+)\s+((@[a-zA-Z0-9_]+)\s*)+$/g
     },
 ]
 
