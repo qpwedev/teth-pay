@@ -1,5 +1,6 @@
 import * as QRCode from 'qrcode';
 import * as fs from 'fs';
+import { Context } from 'telegraf';
 
 async function generateQRCode(data: string, outputFilePath: string): Promise<void> {
     try {
@@ -12,37 +13,49 @@ async function generateQRCode(data: string, outputFilePath: string): Promise<voi
 }
 
 
-
-const editOrSend = async (ctx: any, text: string, markup?: any) => {
+const editOrSend = async (
+    ctx: any,
+    text: string,
+    markup?: any,
+    imagePath: string = './img/main.jpg',
+) => {
     let messageId = ctx.update.callback_query?.message?.message_id;
 
     try {
-        await ctx.telegram.editMessageText(
+        const photoStream = fs.createReadStream(imagePath);
+
+        await ctx.telegram.editMessageMedia(
             ctx.chat!.id,
             messageId,
             undefined,
-            text,
             {
-                reply_markup:
-                {
-                    inline_keyboard: markup
-                }
-
+                type: "photo",
+                media: { source: photoStream },
+                caption: text,
+            },
+            {
+                reply_markup: {
+                    inline_keyboard: markup,
+                },
             }
         );
-        console.log('Message edited successfully')
+        console.log("Media and caption edited successfully");
     } catch (error) {
-        console.log('Editing failed, sending new message:', error);
-        const sentMessage = await ctx.reply(
-            text,
-            {
-                reply_markup:
-                {
-                    inline_keyboard: markup
-                }
+        console.log("Editing failed, sending new message with photo:", error);
 
+        const photoStream = fs.createReadStream(imagePath);
+
+        const sentMessage = await ctx.telegram.sendPhoto(
+            ctx.chat!.id,
+            { source: photoStream },
+            {
+                caption: text,
+                reply_markup: {
+                    inline_keyboard: markup,
+                },
             }
         );
+
         messageId = sentMessage.message_id;
     }
 

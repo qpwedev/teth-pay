@@ -23,20 +23,26 @@ async function getConnectionUri() {
     resolveUri(uri);
   });
 
-  provider
-    .connect({
-      namespaces: {
-        eip155: {
-          methods: ["eth_sendTransaction"],
-          chains: [`eip155:${chainId}`],
-          events: ["chainChanged", "accountsChanged"],
-          rpcMap: {},
+  try {
+    provider
+      .connect({
+        namespaces: {
+          eip155: {
+            methods: ["eth_sendTransaction"],
+            chains: [`eip155:${chainId}`],
+            events: ["chainChanged", "accountsChanged"],
+            rpcMap: {},
+          },
         },
-      },
-    })
-    .then((session) => {
-      console.log("provider", provider);
-    });
+      })
+      .then((session) => {
+        console.log("provider", provider);
+      });
+  }
+  catch (e) {
+    console.log("error", e);
+  }
+
 
   const uri = await uriPromise;
 

@@ -20,7 +20,7 @@ const connectWalletHandler = async (ctx: Context) => {
 
     console.log('connect wallet handler');
 
-    await editOrSend(ctx, 'Connecting wallet...', backKeyboard);
+    await editOrSend(ctx, 'Connecting wallet...', backKeyboard, outputFilePath);
 
 }
 
