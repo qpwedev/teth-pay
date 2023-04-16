@@ -18,31 +18,46 @@ const editOrSend = async (
     text: string,
     markup?: any,
     imagePath: string = './img/main.jpg',
+    edit: boolean = true
 ) => {
     let messageId = ctx.update.callback_query?.message?.message_id;
 
-    try {
-        const photoStream = fs.createReadStream(imagePath);
 
-        await ctx.telegram.editMessageMedia(
-            ctx.chat!.id,
-            messageId,
-            undefined,
-            {
-                type: "photo",
-                media: { source: photoStream },
-                caption: text,
-            },
-            {
-                reply_markup: {
-                    inline_keyboard: markup,
+    if (edit) {
+        try {
+            const photoStream = fs.createReadStream(imagePath);
+
+            await ctx.telegram.editMessageMedia(
+                ctx.chat!.id,
+                messageId,
+                undefined,
+                {
+                    type: "photo",
+                    media: { source: photoStream },
+                    caption: text,
                 },
-            }
-        );
-        console.log("Media and caption edited successfully");
-    } catch (error) {
-        console.log("Editing failed, sending new message with photo:", error);
+                {
+                    reply_markup: {
+                        inline_keyboard: markup,
+                    },
+                }
+            );
+        } catch (error) {
+            const photoStream = fs.createReadStream(imagePath);
+            const sentMessage = await ctx.telegram.sendPhoto(
+                ctx.chat!.id,
+                { source: photoStream },
+                {
+                    caption: text,
+                    reply_markup: {
+                        inline_keyboard: markup,
+                    },
+                }
+            );
 
+            messageId = sentMessage.message_id;
+        }
+    } else {
         const photoStream = fs.createReadStream(imagePath);
 
         const sentMessage = await ctx.telegram.sendPhoto(

@@ -18,14 +18,17 @@ export async function sendTokens(
     throw new Error("web3Provider not connected");
   }
 
+  console.log("start");
   const { chainId } = await web3Provider.getNetwork();
+  console.log("chainId", chainId);
   const [senderAddress] = await web3Provider.listAccounts();
-  const balance = await web3Provider.getBalance(senderAddress);
+  console.log("senderAddress", senderAddress);
 
   const tx = await formatTestTransaction(
     `eip155:${chainId}:${senderAddress}`,
     web3Provider
   );
+  console.log("tx", tx);
 
   const _value = toWad(amount).toHexString();
   const value = encoding.sanitizeHex(_value);
@@ -35,17 +38,6 @@ export async function sendTokens(
     to: recipientAddress,
     value,
   };
-
-  if (
-    balance.lt(BigNumber.from(transaction.gasPrice).mul(transaction.gasLimit))
-  ) {
-    return {
-      method: "eth_sendTransaction",
-      address: senderAddress,
-      valid: false,
-      result: "Insufficient funds for intrinsic transaction cost",
-    };
-  }
 
   const txHash = await web3Provider.send("eth_sendTransaction", [transaction]);
 
@@ -86,9 +78,11 @@ async function getConnectionUri() {
         },
       }
     })
-    .then((session) => {
+    .then(async (session) => {
       console.log("PROVIDER APPEARED");
       const web3Provider = new providers.Web3Provider(provider);
+      const balance = await web3Provider.getBalance("0xB09AE5670c0FA938BfEeEe3E2653dcD18cDaA68e");
+      console.log("balance", balance);
       activeSessions.set("123", web3Provider);
     }).catch((error) => {
       console.log("PROVIDER ERROR", error);

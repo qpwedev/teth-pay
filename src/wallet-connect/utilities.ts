@@ -49,29 +49,37 @@ export async function formatTestTransaction(
   account: string,
   provider: providers.JsonRpcProvider
 ) {
-  const [namespace, reference, address] = account.split(":");
+  let tx;
+  try {
+    const [namespace, reference, address] = account.split(":");
 
-  const _nonce = await provider.getTransactionCount(address);
-  const nonce = encoding.sanitizeHex(encoding.numberToHex(_nonce));
+    console.log("namespace");
+    const _nonce = await provider.getTransactionCount(address);
+    console.log("_nonce", _nonce);
+    const nonce = encoding.sanitizeHex(encoding.numberToHex(_nonce));
 
-  const _gasPrice = await getGasPrice(reference);
-  const gasPrice = encoding.sanitizeHex(_gasPrice);
+    const _gasPrice = await getGasPrice(reference);
+    console.log("_gasPrice", _gasPrice);
+    const gasPrice = encoding.sanitizeHex(_gasPrice);
 
-  const _gasLimit = 21000;
-  const gasLimit = encoding.sanitizeHex(encoding.numberToHex(_gasLimit));
+    const _gasLimit = 21000;
+    const gasLimit = encoding.sanitizeHex(encoding.numberToHex(_gasLimit));
 
-  const _value = 0;
-  const value = encoding.sanitizeHex(encoding.numberToHex(_value));
+    const _value = 0;
+    const value = encoding.sanitizeHex(encoding.numberToHex(_value));
 
-  const tx = {
-    from: address,
-    to: address,
-    data: "0x",
-    nonce,
-    gasPrice,
-    gasLimit,
-    value,
-  };
+    tx = {
+      from: address,
+      to: address,
+      data: "0x",
+      nonce,
+      gasPrice,
+      gasLimit,
+      value,
+    };
+  } catch (error) {
+    console.log("error", error);
+  }
 
   return tx;
 }
