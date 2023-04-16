@@ -80,16 +80,24 @@ const inlineQueryHandler = async (ctx: Context) => {
     );
 }
 
-const inlineQueryResultHandler = async (ctx: Context) => {
+const inlineQueryResultHandler = async (ctx: any) => {
     // test data 
     const web3Provider = activeSessions.get("123");
+    const inlineQueryMessage = ctx.update.chosen_inline_result!.query;
+    const type = validateInlineQuery(inlineQueryMessage);
 
-    await sendTokens(
-        // @ts-ignore
-        web3Provider,
-        "0xB09AE5670c0FA938BfEeEe3E2653dcD18cDaA68e",
-        '777'
-    );
+    let result: InlineQueryResult[];
+
+    if (type === InlineQueryType.SEND) {
+        const [username, amount, currency] = inlineQueryMessage.split(' ');
+        await sendTokens(
+            // @ts-ignore
+            web3Provider,
+            "0xB09AE5670c0FA938BfEeEe3E2653dcD18cDaA68e",
+            amount, currency
+        );
+    }
+
 }
 
 

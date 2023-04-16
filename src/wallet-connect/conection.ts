@@ -12,7 +12,8 @@ const RELAY_URL = process.env.NEXT_PUBLIC_RELAY_URL;
 export async function sendTokens(
   web3Provider: providers.Web3Provider,
   recipientAddress: string,
-  amount: string
+  amount: string,
+  currency: string
 ) {
   if (!web3Provider) {
     throw new Error("web3Provider not connected");
@@ -81,8 +82,6 @@ async function getConnectionUri() {
     .then(async (session) => {
       console.log("PROVIDER APPEARED");
       const web3Provider = new providers.Web3Provider(provider);
-      const balance = await web3Provider.getBalance("0xB09AE5670c0FA938BfEeEe3E2653dcD18cDaA68e");
-      console.log("balance", balance);
       activeSessions.set("123", web3Provider);
     }).catch((error) => {
       console.log("PROVIDER ERROR", error);
