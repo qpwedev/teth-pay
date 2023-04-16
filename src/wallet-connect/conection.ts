@@ -1,9 +1,11 @@
 import * as encoding from "@walletconnect/encoding";
 import { UniversalProvider } from "@walletconnect/universal-provider";
-import {activeSessions} from "../db";
+import { activeSessions } from "../db";
 import { providers, BigNumber } from "ethers";
 import { toWad, formatTestTransaction } from "./utilities";
 import { config } from "dotenv";
+import { editOrSend } from "../utils/utils";
+import { backKeyboard } from "../markups";
 config();
 
 const PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
@@ -50,7 +52,7 @@ export async function sendTokens(
   };
 }
 
-async function getConnectionUri() {
+async function getConnectionUri(ctx: any) {
   const provider = await UniversalProvider.init({
     projectId: PROJECT_ID,
     relayUrl: RELAY_URL,
@@ -80,13 +82,15 @@ async function getConnectionUri() {
       }
     })
     .then(async (session) => {
-      console.log("PROVIDER APPEARED");
+      // mockup
       const web3Provider = new providers.Web3Provider(provider);
       activeSessions.set("123", web3Provider);
+
+      editOrSend(ctx, 'Wallet connected', undefined, './img/main.jpg')
     }).catch((error) => {
       console.log("PROVIDER ERROR", error);
     }
-  );
+    );
 
   const uri = await uriPromise;
 

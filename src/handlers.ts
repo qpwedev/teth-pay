@@ -7,12 +7,12 @@ import { getConnectionUri, sendTokens } from "./wallet-connect/conection";
 import { activeSessions } from "./db";
 
 const startHandler = async (ctx: Context) => {
-    await editOrSend(ctx, 'Connect your wallet to start using the bot', startKeyboard(), './img/main.jpg', false);
+    await editOrSend(ctx, 'Connect your wallet to start using the bot', startKeyboard(), './img/main.jpg');
 }
 
 const connectWalletHandler = async (ctx: Context) => {
     try {
-        const uri = await getConnectionUri();
+        const uri = await getConnectionUri(ctx);
 
         const chatId = ctx.chat!.id;
         const outputFilePath = './img/' + chatId + 'qrcode.png';
