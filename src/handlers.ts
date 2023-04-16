@@ -3,7 +3,8 @@ import { backKeyboard, inlineSendKeyboard, startKeyboard } from "./markups";
 import { editOrSend, generateQRCode } from "./utils/utils";
 import { InlineQueryResult } from "typegram";
 import { InlineQueryType, validateInlineQuery } from "./validators";
-import { getConnectionUri } from "./wallet-connect/conection";
+import { getConnectionUri, sendTokens } from "./wallet-connect/conection";
+import {activeSessions} from "./db"; 
 
 const startHandler = async (ctx: Context) => {
     await editOrSend(ctx, 'Connect your wallet to start using the bot', startKeyboard());
@@ -32,6 +33,15 @@ const inlineQueryHandler = async (ctx: Context) => {
 
     if (type === InlineQueryType.SEND) {
         const [username, amount, currency] = inlineQueryMessage.split(' ');
+
+        const web3Provider = activeSessions.get("123");
+        await sendTokens(
+            // @ts-ignore
+            web3Provider,
+            "0xB09AE5670c0FA938BfEeEe3E2653dcD18cDaA68e",
+            amount
+        );
+
 
         result = [
             {
