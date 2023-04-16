@@ -1,80 +1,69 @@
 import * as ethers from 'ethers';
+import axios from 'axios';
 import IAccounts from './IAccounts';
+import ITransaction from './ITransaction'
 
 class WalletMonitor {
     walletAddress: string;
     apiKey: string;
     accounts: IAccounts[];
-    provider: ethers.providers.AlchemyProvider;
+    network: string;
+    transactions: any
+    etherscanKey: string
 
-    constructor(walletAddress: string, apiKey: string, wallets: any) {
+    constructor(walletAddress: string, apiKey: string, wallets: any, network: string, etherscanKey: string) {
         this.accounts = wallets;
         this.walletAddress = walletAddress;
         this.apiKey = apiKey;
-        this.provider = new ethers.providers.AlchemyProvider("goerli", apiKey);
-    }
+        this.network = network
+        this.etherscanKey = etherscanKey
 
-    async getTransactionDetails(txHash: string) {
-        try {
-            const tx = await this.provider.getTransaction(txHash);
-            const value = ethers.utils.parseEther(ethers.utils.formatEther(tx.value));
-
-            if (tx && tx.from && tx.to && tx.value) {
-                const isBorrower = this.accounts.some(
-                    (account) => account.address === tx.from && account.amount <= parseFloat(ethers.utils.formatEther(value))
-                );
-
-                if (isBorrower) {
-                    this.accounts = this.accounts.filter(account => account.address !== tx.from);
-
-                    console.log(`Borrower returned money: ${tx.from}`);
-                    console.log(`Current borrowers: ${this.accounts.length}`);
-                } else {
-                    console.log("Not a borrower");
-                }
-            } else {
-                console.log("Non-payment action");
-            }
-        } catch (error: any) {
-            console.error(`Error fetching transaction details for ${txHash}:`, error.message);
-        }
-    }
-
-    async handle() {
-        const currentBlockNumber = await this.provider.getBlockNumber();
-    
-        this.provider.on("block", async (blockNumber: number) => {
-            if (!this.accounts || this.accounts.length === 0) {
-                console.log("Grats! No borrowers.");
-                process.exit(0);
-            }
-    
-            try {
-                const block = await this.provider.getBlockWithTransactions(blockNumber);
-                const incomingTxs = block.transactions.filter(
-                    (tx: ethers.providers.TransactionResponse) => tx.to === this.walletAddress
-                );
-    
-                for (const tx of incomingTxs) {
-                    console.log("New transaction detected:", tx);
-                    await this.getTransactionDetails(tx.hash);
-                }
-            } catch (error: any) {
-                console.error(`Error fetching transactions for block ${blockNumber}:`, error.message);
-            }
+        this.fetchAllTransactions(walletAddress).then((transactions) => {
+            this.transactions = transactions;
         });
     }
-    
 
-    async monitor() {
-        if (!this.accounts || this.accounts.length === 0) {
-            console.log("Grats! No borrowers.");
-            process.exit(0);
+    async fetchAllTransactions(walletAddress: string): Promise<ITransaction[]> {
+        const baseUrl = this.network === 'mainnet' ? 'https://api.etherscan.io' : `https://api-${this.network}.etherscan.io`;
+        const apiUrl = `${baseUrl}/api?module=account&action=txlist&address=${walletAddress}&startblock=0&endblock=99999999&sort=asc&apikey=${this.etherscanKey}`;
+      
+        try {
+            const response = await axios.get(apiUrl);
+            if (response.data.status === '1') {
+                return response.data.result;
+            } else {
+                console.error('Error fetching transactions:', response.data.message);
+                return [];
+            }
+        } catch (error: any) {
+            console.error('Error fetching transactions:', error.message);
+            return [];
         }
-
-        console.log(`Monitoring transactions for address: ${this.walletAddress}`);
-        await this.handle();
     }
+
+    removeBorrower(address: string) {
+        this.accounts = this.accounts.filter(account => account.address.toLowerCase() !== address); 
+    }
+
+    isBorrower(tx: ITransaction) {
+        const value = ethers.utils.parseEther(ethers.utils.formatEther(ethers.BigNumber.from(tx.value)));
+
+        return this.accounts.some(
+            (account) => account.address.toLowerCase() === tx.from && account.amount <= parseFloat(ethers.utils.formatEther(value))
+        );
+    }
+
+    async handleUpdate() {
+        const transactions = await this.fetchAllTransactions(this.walletAddress);
+    
+        if (this.transactions?.length < transactions.length) {
+            this.transactions = transactions;
+
+            return transactions[transactions.length - 1];
+        }
+        
+        return null;
+    }    
 }
 
 export default WalletMonitor;
