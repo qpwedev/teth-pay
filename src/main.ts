@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 config();
 
-import { Telegraf, Context } from 'telegraf';
+import { Telegraf } from 'telegraf';
 import { connectWalletHandler, inlineQueryHandler, inlineQueryResultHandler, startHandler } from './handlers';
 
 console.log('Starting bot...');
