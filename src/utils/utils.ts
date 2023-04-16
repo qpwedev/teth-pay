@@ -1,3 +1,16 @@
+import * as QRCode from 'qrcode';
+import * as fs from 'fs';
+
+async function generateQRCode(data: string, outputFilePath: string): Promise<void> {
+    try {
+        const qrCodeImageBuffer = await QRCode.toBuffer(data);
+        fs.writeFileSync(outputFilePath, qrCodeImageBuffer);
+        console.log(`QR code image saved to ${outputFilePath}`);
+    } catch (error) {
+        console.error(`Failed to generate QR code: ${error}`);
+    }
+}
+
 
 
 const editOrSend = async (ctx: any, text: string, markup?: any) => {
@@ -37,5 +50,6 @@ const editOrSend = async (ctx: any, text: string, markup?: any) => {
 };
 
 export {
-    editOrSend
+    editOrSend,
+    generateQRCode
 }

@@ -3,13 +3,11 @@ import { config } from "dotenv";
 config();
 
 const PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
-const DEFAULT_LOGGER = "debug";
 const RELAY_URL = process.env.NEXT_PUBLIC_RELAY_URL;
 
 async function getConnectionUri() {
   const provider = await UniversalProvider.init({
     projectId: PROJECT_ID,
-    logger: DEFAULT_LOGGER,
     relayUrl: RELAY_URL,
   });
 
@@ -42,5 +40,9 @@ async function getConnectionUri() {
 
   const uri = await uriPromise;
 
-  return { uri };
+  return uri;
+}
+
+export {
+  getConnectionUri
 }

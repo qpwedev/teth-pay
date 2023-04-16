@@ -1,14 +1,23 @@
 import { Context } from "telegraf";
 import { backKeyboard, inlineSendKeyboard, startKeyboard } from "./markups";
-import { editOrSend } from "./utils/utils";
+import { editOrSend, generateQRCode } from "./utils/utils";
 import { InlineQueryResult } from "typegram";
 import { InlineQueryType, validateInlineQuery } from "./validators";
+import { getConnectionUri } from "./wallet-connect/conection";
 
 const startHandler = async (ctx: Context) => {
     await editOrSend(ctx, 'Connect your wallet to start using the bot', startKeyboard());
 }
 
 const connectWalletHandler = async (ctx: Context) => {
+    const uri = await getConnectionUri();
+
+    const chatId = ctx.chat!.id;
+
+    const outputFilePath = './img/' + chatId + 'qrcode.png';
+
+    await generateQRCode(uri.toString(), outputFilePath);
+
     console.log('connect wallet handler');
 
     await editOrSend(ctx, 'Connecting wallet...', backKeyboard);
