@@ -12,8 +12,8 @@ Simplify and enhance the payment experience for Telegram users by providing a no
 ## Features
 
 1. Access via Telegram
-1. Lightweight DAO
-1. Split the bill
+1. Easy to use. Just type "@tethpaybot {@receiver_username} 0.1 eth"
+1. Lightweight DAO (TBA)
+1. Split the bill (TBA)
 1. Non-custodial approach, gives users full control over their funds
 1. Fast & Secure
-1. Easy to use. Just type "@tethpaybot {@receiver_username} 0.1 eth"
