@@ -1,4 +1,4 @@
-# TETH Pay
+# TETH Pay ([ETHZurich](https://ethereumzuri.ch) hackathon project) 
 
 The future of P2P payments. A non-custodial payment add-on seamlessly integrating ERC20 tokens with Telegram.
 
